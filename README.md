@@ -1,6 +1,10 @@
 # outsystems-o11-lifetime-mcp
 
+[![npm version](https://img.shields.io/npm/v/outsystems-o11-lifetime-mcp.svg)](https://www.npmjs.com/package/outsystems-o11-lifetime-mcp)
+
 MCP server that wraps the [OutSystems O11 LifeTime API V2](https://success.outsystems.com/documentation/11/reference/outsystems_apis/lifetime_api_v2/) so agents can manage an O11 infrastructure over the Model Context Protocol.
+
+**npm:** [outsystems-o11-lifetime-mcp](https://www.npmjs.com/package/outsystems-o11-lifetime-mcp)
 
 Tools map 1:1 to LifeTime REST endpoints for applications, environments, deployments, modules, roles, teams, and users.
 
@@ -9,21 +13,15 @@ Tools map 1:1 to LifeTime REST endpoints for applications, environments, deploym
 - Node.js 20+
 - A LifeTime **service account** and token ([REST API authentication](https://success.outsystems.com/documentation/11/reference/outsystems_apis/lifetime_api_v2/rest_api_authentication/))
 
-## Quick start
+## Install / run
 
 ```bash
-npm install
-npm run build
-
-export LIFETIME_URL="https://your-lt.example.com/lifetime"
-export LIFETIME_TOKEN="your-service-account-token"
-
-npm start
+npx -y outsystems-o11-lifetime-mcp
 ```
 
-The server speaks MCP over **stdio**. Point your MCP client at `dist/index.js` (or `npm run dev` during development).
+Set `LIFETIME_URL` and `LIFETIME_TOKEN` in the environment (or in your MCP client config). The server speaks MCP over **stdio**.
 
-Do not commit tokens. Prefer environment variables or your MCP client’s secret/env settings. `.env` is gitignored if you use one locally for tests.
+Do not commit tokens. Prefer environment variables or your MCP client’s secret/env settings.
 
 ## Configuration
 
@@ -45,8 +43,8 @@ Add to `~/.cursor/mcp.json` or project `.cursor/mcp.json`:
 {
   "mcpServers": {
     "outsystems-o11-lifetime": {
-      "command": "node",
-      "args": ["/absolute/path/to/outsystems-o11-lifetime-mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "outsystems-o11-lifetime-mcp"],
       "env": {
         "LIFETIME_URL": "https://your-lt.example.com/lifetime",
         "LIFETIME_TOKEN": "your-service-account-token"
@@ -57,6 +55,28 @@ Add to `~/.cursor/mcp.json` or project `.cursor/mcp.json`:
 ```
 
 Restart Cursor (or reload MCP servers), then call tools such as `list_environments` or `list_users`.
+
+### Local checkout (optional)
+
+```bash
+git clone https://github.com/invisible-ethan/outsystems-o11-lifetime-mcp.git
+cd outsystems-o11-lifetime-mcp
+npm install
+npm run build
+
+export LIFETIME_URL="https://your-lt.example.com/lifetime"
+export LIFETIME_TOKEN="your-service-account-token"
+npm start
+```
+
+Point Cursor at the built binary instead of `npx` if you prefer:
+
+```json
+{
+  "command": "node",
+  "args": ["/absolute/path/to/outsystems-o11-lifetime-mcp/dist/index.js"]
+}
+```
 
 ## Tools
 
@@ -88,6 +108,16 @@ npm run build
 ```
 
 `npm test` runs every `test/**/*.test.ts` file. Live tests run when `LIVE_LIFETIME_TESTS=1` or when `LIFETIME_URL` + `LIFETIME_TOKEN` are set (including via a local `.env` loaded by the live test helper).
+
+### Publishing
+
+```bash
+npm run build
+npm version patch   # or minor / major
+npm publish --access public
+```
+
+Requires an npm account with publish rights (2FA / granular token with bypass as needed).
 
 ## API reference
 
