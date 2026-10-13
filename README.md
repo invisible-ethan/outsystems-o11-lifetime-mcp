@@ -1,45 +1,45 @@
 # outsystems-o11-lifetime-mcp
 
-MCP server that wraps the [OutSystems O11 LifeTime API V2](https://success.outsystems.com/documentation/11/reference/outsystems_apis/lifetime_api_v2/).
+MCP server that wraps the [OutSystems O11 LifeTime API V2](https://success.outsystems.com/documentation/11/reference/outsystems_apis/lifetime_api_v2/) so agents can manage an O11 infrastructure over the Model Context Protocol.
 
-Agents can manage applications, environments, deployments, modules, roles, teams, and users through MCP tools that map 1:1 to LifeTime REST endpoints.
+Tools map 1:1 to LifeTime REST endpoints for applications, environments, deployments, modules, roles, teams, and users.
 
 ## Requirements
 
 - Node.js 20+
-- A LifeTime **service account** token ([REST API authentication](https://success.outsystems.com/documentation/11/reference/outsystems_apis/lifetime_api_v2/rest_api_authentication/))
+- A LifeTime **service account** and token ([REST API authentication](https://success.outsystems.com/documentation/11/reference/outsystems_apis/lifetime_api_v2/rest_api_authentication/))
+
+## Quick start
+
+```bash
+npm install
+npm run build
+
+export LIFETIME_URL="https://your-lt.example.com/lifetime"
+export LIFETIME_TOKEN="your-service-account-token"
+
+npm start
+```
+
+The server speaks MCP over **stdio**. Point your MCP client at `dist/index.js` (or `npm run dev` during development).
+
+Do not commit tokens. Prefer environment variables or your MCP client’s secret/env settings. `.env` is gitignored if you use one locally for tests.
 
 ## Configuration
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `LIFETIME_URL` | one of URL / API base | LifeTime host, e.g. `https://example-lt.company.com` (trailing `/lifetime` is stripped) |
-| `LIFETIME_API_BASE_URL` | one of URL / API base | Full API base override, e.g. `https://example-lt.company.com/lifetimeapi/rest/v2` |
+| `LIFETIME_URL` | one of URL / API base | LifeTime environment root, e.g. `https://your-lt.example.com` or `…/lifetime` |
+| `LIFETIME_API_BASE_URL` | one of URL / API base | Full API base override |
 | `LIFETIME_TOKEN` | yes | Service account bearer token (`LIFETIME_API_TOKEN` also accepted) |
 
-API base resolution (from docs): if LifeTime is at `example-lt.example.com/lifetime`, the API is at `example-lt.example.com/lifetimeapi/rest/v2`.
+**URL resolution:** if LifeTime is at `https://host.example.com/lifetime`, the API base becomes `https://host.example.com/lifetimeapi/rest/v2`. Trailing `/lifetime` is stripped automatically.
 
-Copy `.env.example` and fill in values for local runs.
+See `.env.example` for a local template. The MCP server process does not load `.env` itself — export variables in the shell or set them in the MCP client config.
 
-## Install & run
+## Cursor setup
 
-```bash
-npm install
-npm run build
-export LIFETIME_URL=https://your-lt.example.com
-export LIFETIME_TOKEN=your-service-account-token
-npm start
-```
-
-Dev (tsx, no build):
-
-```bash
-npm run dev
-```
-
-## Cursor MCP config
-
-Add to `~/.cursor/mcp.json` or `.cursor/mcp.json`:
+Add to `~/.cursor/mcp.json` or project `.cursor/mcp.json`:
 
 ```json
 {
@@ -48,7 +48,7 @@ Add to `~/.cursor/mcp.json` or `.cursor/mcp.json`:
       "command": "node",
       "args": ["/absolute/path/to/outsystems-o11-lifetime-mcp/dist/index.js"],
       "env": {
-        "LIFETIME_URL": "https://your-lt.example.com",
+        "LIFETIME_URL": "https://your-lt.example.com/lifetime",
         "LIFETIME_TOKEN": "your-service-account-token"
       }
     }
@@ -56,52 +56,44 @@ Add to `~/.cursor/mcp.json` or `.cursor/mcp.json`:
 }
 ```
 
-Or via `npx` after publish:
-
-```json
-{
-  "mcpServers": {
-    "outsystems-o11-lifetime": {
-      "command": "npx",
-      "args": ["-y", "outsystems-o11-lifetime-mcp"],
-      "env": {
-        "LIFETIME_URL": "https://your-lt.example.com",
-        "LIFETIME_TOKEN": "your-service-account-token"
-      }
-    }
-  }
-}
-```
+Restart Cursor (or reload MCP servers), then call tools such as `list_environments` or `list_users`.
 
 ## Tools
 
-50 tools covering LifeTime API v2:
+50 tools, grouped by LifeTime resource:
 
-- **Applications** — list/get apps & versions, delete version, download content link
-- **Environments** — list/get envs, running apps, create app/version, deploy zones, templates, CSP
-- **Deployments** — create/list/update/delete, status, `start` / `continue` / `abort`
-- **Modules** — list/get modules & versions
-- **Roles** — CRUD + permission levels
-- **Teams** — CRUD, add/remove apps & users
-- **Users** — CRUD, set password, grant/revoke application roles
+| Area | Tools |
+|------|--------|
+| **Applications** | `list_applications`, `get_application`, `list_application_versions`, `get_application_version`, `delete_application_version`, `get_application_version_content` |
+| **Environments** | `list_environments`, `get_environment`, `list_environment_applications`, `create_environment_application`, `get_environment_application`, `get_environment_application_content`, `create_application_version_from_environment`, `list_deployment_zones`, `list_environment_templates`, `get_content_security_policies`, `set_content_security_policies` |
+| **Deployments** | `list_deployments`, `create_deployment`, `get_deployment`, `update_deployment`, `delete_deployment`, `get_deployment_status`, `execute_deployment_command` |
+| **Modules** | `list_modules`, `get_module`, `list_module_versions`, `get_module_version` |
+| **Roles** | `list_roles`, `create_role`, `get_role`, `update_role`, `delete_role`, `list_permission_levels` |
+| **Teams** | `list_teams`, `create_team`, `get_team`, `update_team`, `delete_team`, `add_team_application`, `remove_team_application`, `add_team_user`, `remove_team_user` |
+| **Users** | `list_users`, `create_user`, `get_user`, `update_user`, `set_user_password`, `grant_user_application_role`, `revoke_user_application_role` |
 
-Every request sends `Authorization: Bearer <LIFETIME_TOKEN>` over HTTPS. Permissions match the service account’s LifeTime roles and teams.
+Full HTTP method/path map: [`docs/lifetime-api-v2-endpoints.md`](docs/lifetime-api-v2-endpoints.md).
+
+All calls use `Authorization: Bearer <token>` over HTTPS. Effective permissions match the service account’s LifeTime roles and teams.
 
 ## Development
 
 ```bash
+npm install
 npm run typecheck
-npm test          # unit + mocked tool cases for all 50 tools; live read-only if .env present
-npm run test:unit # mocked only
-npm run test:live # read-only tools against real LifeTime (needs LIFETIME_URL + LIFETIME_TOKEN)
-npm run smoke
+npm run test:unit    # config, client, and mocked cases for all 50 tools
+npm run test:live    # read-only tools against a real LifeTime (needs env vars)
+npm run smoke        # list registered tools + one mock call
+npm run build
 ```
+
+`npm test` runs every `test/**/*.test.ts` file. Live tests run when `LIVE_LIFETIME_TESTS=1` or when `LIFETIME_URL` + `LIFETIME_TOKEN` are set (including via a local `.env` loaded by the live test helper).
 
 ## API reference
 
 - [LifeTime API v2](https://success.outsystems.com/documentation/11/reference/outsystems_apis/lifetime_api_v2/)
 - [REST API authentication](https://success.outsystems.com/documentation/11/reference/outsystems_apis/lifetime_api_v2/rest_api_authentication/)
-- Swagger file: download from LifeTime Management Console binaries (11.5.0+)
+- Swagger: download from LifeTime Management Console binaries (11.5.0+)
 
 ## License
 
