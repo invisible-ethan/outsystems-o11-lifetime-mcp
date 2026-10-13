@@ -1,0 +1,54 @@
+{
+  "name": "outsystems-o11-lifetime-mcp",
+  "version": "0.1.0",
+  "description": "MCP server wrapping the OutSystems O11 LifeTime API V2",
+  "type": "module",
+  "bin": {
+    "outsystems-o11-lifetime-mcp": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test test/**/*.test.ts",
+    "test:unit": "tsx --test test/config.test.ts test/client.test.ts test/tools.test.ts",
+    "test:live": "LIVE_LIFETIME_TESTS=1 tsx --test test/tools.live.test.ts",
+    "smoke": "tsx scripts/smoke-list-tools.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/invisible-ethan/outsystems-o11-lifetime-mcp.git"
+  },
+  "keywords": [
+    "mcp",
+    "outsystems",
+    "lifetime",
+    "o11",
+    "model-context-protocol"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/invisible-ethan/outsystems-o11-lifetime-mcp/issues"
+  },
+  "homepage": "https://github.com/invisible-ethan/outsystems-o11-lifetime-mcp#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
