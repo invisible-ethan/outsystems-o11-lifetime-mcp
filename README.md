@@ -91,7 +91,9 @@ Every request sends `Authorization: Bearer <LIFETIME_TOKEN>` over HTTPS. Permiss
 
 ```bash
 npm run typecheck
-npm test
+npm test          # unit + mocked tool cases for all 50 tools; live read-only if .env present
+npm run test:unit # mocked only
+npm run test:live # read-only tools against real LifeTime (needs LIFETIME_URL + LIFETIME_TOKEN)
 npm run smoke
 ```
 

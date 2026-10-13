@@ -1,59 +1,9 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createLifeTimeMcpServer } from "../src/server.js";
+import { TOOL_NAMES } from "../src/tool-catalog.js";
 
-const EXPECTED_TOOLS = [
-  "list_applications",
-  "get_application",
-  "list_application_versions",
-  "get_application_version",
-  "delete_application_version",
-  "get_application_version_content",
-  "list_environments",
-  "get_environment",
-  "list_environment_applications",
-  "create_environment_application",
-  "get_environment_application",
-  "get_environment_application_content",
-  "create_application_version_from_environment",
-  "list_deployment_zones",
-  "list_environment_templates",
-  "get_content_security_policies",
-  "set_content_security_policies",
-  "list_deployments",
-  "create_deployment",
-  "get_deployment",
-  "update_deployment",
-  "delete_deployment",
-  "get_deployment_status",
-  "execute_deployment_command",
-  "list_modules",
-  "get_module",
-  "list_module_versions",
-  "get_module_version",
-  "list_roles",
-  "create_role",
-  "get_role",
-  "update_role",
-  "delete_role",
-  "list_permission_levels",
-  "list_teams",
-  "create_team",
-  "get_team",
-  "update_team",
-  "delete_team",
-  "add_team_application",
-  "remove_team_application",
-  "add_team_user",
-  "remove_team_user",
-  "list_users",
-  "create_user",
-  "get_user",
-  "update_user",
-  "set_user_password",
-  "grant_user_application_role",
-  "revoke_user_application_role",
-] as const;
+const EXPECTED_TOOLS = TOOL_NAMES;
 
 async function main(): Promise<void> {
   const { server } = createLifeTimeMcpServer({

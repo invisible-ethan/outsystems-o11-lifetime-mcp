@@ -18,6 +18,8 @@
     "dev": "tsx src/index.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "tsx --test test/**/*.test.ts",
+    "test:unit": "tsx --test test/config.test.ts test/client.test.ts test/tools.test.ts",
+    "test:live": "LIVE_LIFETIME_TESTS=1 tsx --test test/tools.live.test.ts",
     "smoke": "tsx scripts/smoke-list-tools.ts"
   },
   "repository": {
