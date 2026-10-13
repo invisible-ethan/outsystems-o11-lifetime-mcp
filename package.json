@@ -4,7 +4,7 @@
   "description": "MCP server wrapping the OutSystems O11 LifeTime API V2",
   "type": "module",
   "bin": {
-    "outsystems-o11-lifetime-mcp": "./dist/index.js"
+    "outsystems-o11-lifetime-mcp": "dist/index.js"
   },
   "main": "./dist/index.js",
   "files": [
