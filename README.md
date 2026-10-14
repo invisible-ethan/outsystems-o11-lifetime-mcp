@@ -35,7 +35,9 @@ Do not commit tokens. Prefer environment variables or your MCP client’s secret
 
 See `.env.example` for a local template. The MCP server process does not load `.env` itself — export variables in the shell or set them in the MCP client config.
 
-## Cursor setup
+## MCP client setup
+
+### Cursor
 
 Add to `~/.cursor/mcp.json` or project `.cursor/mcp.json`:
 
@@ -56,6 +58,50 @@ Add to `~/.cursor/mcp.json` or project `.cursor/mcp.json`:
 
 Restart Cursor (or reload MCP servers), then call tools such as `list_environments` or `list_users`.
 
+### Claude Code
+
+Add a local stdio server with the Claude Code CLI ([MCP docs](https://code.claude.com/docs/en/mcp)):
+
+```bash
+claude mcp add \
+  --transport stdio \
+  --env LIFETIME_URL=https://your-lt.example.com/lifetime \
+  --env LIFETIME_TOKEN=your-service-account-token \
+  outsystems-o11-lifetime \
+  -- npx -y outsystems-o11-lifetime-mcp
+```
+
+Notes:
+
+- Put env vars with `--env` **before** the server name, and put the launch command after `--` so Claude Code does not treat `npx` flags as its own options.
+- Default scope is local/user. Use `--scope project` to write a shared project `.mcp.json`, or `--scope user` for your user config.
+
+Equivalent JSON (project `.mcp.json`, or `claude mcp add-json`):
+
+```json
+{
+  "mcpServers": {
+    "outsystems-o11-lifetime": {
+      "command": "npx",
+      "args": ["-y", "outsystems-o11-lifetime-mcp"],
+      "env": {
+        "LIFETIME_URL": "https://your-lt.example.com/lifetime",
+        "LIFETIME_TOKEN": "your-service-account-token"
+      }
+    }
+  }
+}
+```
+
+Verify the server:
+
+```bash
+claude mcp get outsystems-o11-lifetime
+claude mcp list
+```
+
+Then start Claude Code (`claude`) and ask it to use tools such as `list_environments` or `list_users`.
+
 ### Local checkout (optional)
 
 ```bash
@@ -69,7 +115,7 @@ export LIFETIME_TOKEN="your-service-account-token"
 npm start
 ```
 
-Point Cursor at the built binary instead of `npx` if you prefer:
+Point your MCP client at the built binary instead of `npx` if you prefer:
 
 ```json
 {
